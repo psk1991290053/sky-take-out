@@ -106,4 +106,15 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(total,records);
     }
 
+    //启用和禁用员工账号
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        //考虑到复用性，我们在这里调用Mapper层接口时，设计了可复用性的update方法
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .build();
+        employeeMapper.update(employee);
+    }
+
 }

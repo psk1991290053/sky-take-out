@@ -91,6 +91,13 @@ public class EmployeeController {
     }
 
 
+    //启用和禁用员工账号
+    @PostMapping("/status/{status}")
+    public Result startOrStop(@PathVariable Integer status,Long id){
+        log.info("启用和禁用员工账号");
+        employeeService.startOrStop(status,id);
+        return Result.success();
+    }
 
 
 
