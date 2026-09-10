@@ -107,6 +107,7 @@ public class DishServiceImpl implements DishService {
 
     //更新菜品和对应的口味数据
     @Override
+    @Transactional
     public void updateWithFlavor(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO,dish);
@@ -126,6 +127,20 @@ public class DishServiceImpl implements DishService {
             });
             dishFlavorMapper.insertBatch(dishFlavors);
         }
+    }
+
+    /**
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @Override
+    public List<Dish> list(Long categoryId) {
+        Dish dish = Dish.builder()
+                .categoryId(categoryId)
+                .status(StatusConstant.ENABLE)
+                .build();
+        return dishMapper.list(dish);
     }
 
 
