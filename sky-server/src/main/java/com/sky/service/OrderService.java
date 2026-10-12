@@ -1,16 +1,19 @@
 package com.sky.service;
 
 import com.github.pagehelper.PageInfo;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrdersVO;
 
 import java.util.List;
 
 public interface OrderService {
+
+    //订单条件查询
+    PageInfo<Orders> search(OrdersPageQueryDTO ordersPageQueryDTO);
 
     //用户下单
     OrderSubmitVO submit(OrdersSubmitDTO ordersSubmitDTO);
@@ -39,4 +42,22 @@ public interface OrderService {
 
     //再来一单
     void repetition(Integer id);
+
+    //根据订单状态统计订单数量
+    OrderStatisticsVO countByStatus();
+
+    //接单
+    void confirm(Long id);
+
+    //拒单
+    void rejection(OrdersRejectionDTO ordersRejectionDTO);
+
+    //取消订单
+    void cancel(OrdersCancelDTO ordersCancelDTO);
+
+    //派送订单
+    void delivery(Long id);
+
+    //完成订单
+    void complete(Long id);
 }

@@ -1,5 +1,7 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.PageInfo;
+import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -37,4 +39,11 @@ public interface OrderMapper {
     //根据订单id取消订单
     @Update("update orders set status = 6 where id = #{id}")
     void cancelById(Integer id);
+
+    //条件查询订单
+    PageInfo<Orders> conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    //根据状态查询订单数量
+    @Select("select * from orders where status = #{status}")
+    Integer countByStatus(Integer status);
 }

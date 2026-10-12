@@ -5,8 +5,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.*;
 import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
@@ -16,6 +15,7 @@ import com.sky.service.OrderService;
 import com.sky.service.ShoppingCartService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrdersVO;
 import org.springframework.beans.BeanUtils;
@@ -45,6 +45,18 @@ public class OrderServiceImpl implements OrderService {
     private WeChatPayUtil weChatPayUtil;
     @Autowired
     private UserMapper userMapper;
+
+    //订单条件搜索
+    public PageInfo<Orders> search(OrdersPageQueryDTO ordersPageQueryDTO) {
+        //开启分页查询
+        PageHelper.startPage(ordersPageQueryDTO.getPage(),ordersPageQueryDTO.getPageSize());
+
+        //调用mapper接口
+        PageInfo<Orders> pageInfo = orderMapper.conditionSearch(ordersPageQueryDTO);
+
+        //返回结果
+        return pageInfo;
+    }
 
     //用户下单
     @Transactional
@@ -206,6 +218,60 @@ public class OrderServiceImpl implements OrderService {
             orderDetail.setOrderId(orders.getId());
         }
         orderDetailMapper.insertBatch(orderDetailList);
+    }
+
+    //根据订单状态确定订单数量
+    public OrderStatisticsVO countByStatus() {
+        OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
+        //待派送数量
+        orderStatisticsVO.setConfirmed(orderMapper.countByStatus(Orders.CONFIRMED));
+        //待接单数量
+        orderStatisticsVO.setToBeConfirmed(orderMapper.countByStatus(Orders.TO_BE_CONFIRMED));
+        //派送中数量
+        orderStatisticsVO.setDeliveryInProgress(orderMapper.countByStatus(Orders.DELIVERY_IN_PROGRESS));
+        //返回结果
+        return orderStatisticsVO;
+    }
+
+    //接单
+    public void confirm(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.CONFIRMED);
+        orderMapper.update(orders);
+    }
+
+    //拒单
+    public void rejection(OrdersRejectionDTO ordersRejectionDTO) {
+        Orders orders = new Orders();
+        BeanUtils.copyProperties(ordersRejectionDTO,orders);
+        orders.setStatus(Orders.CANCELLED);
+        orderMapper.update(orders);
+    }
+
+    //取消订单
+    public void cancel(OrdersCancelDTO ordersCancelDTO) {
+        Orders orders = new Orders();
+        BeanUtils.copyProperties(ordersCancelDTO,orders);
+        orders.setStatus(Orders.CANCELLED);
+        orderMapper.update(orders);
+    }
+
+    //派送订单
+    public void delivery(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
+        orderMapper.update(orders);
+    }
+
+    //完成订单
+    public void complete(Long id) {
+        Orders orders = new Orders();
+        orders.setId(id);
+        orders.setStatus(Orders.COMPLETED);
+        orders.setDeliveryTime(LocalDateTime.now());
+        orderMapper.update(orders);
     }
 
 

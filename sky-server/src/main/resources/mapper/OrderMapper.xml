@@ -28,4 +28,34 @@
         where id = #{id}
     </update>
 
+    <select id="conditionSearch" resultType="com/sky/entity/Orders">
+        select * from orders
+        <where>
+            <if test="status != null and (status == 1 or status == 2 or status == 3 or status == 4)">
+                and order_time >= #{beginTime}
+            </if>
+            <if test="status != null and status == 5">
+                and order_time &gt;= #{beginTime} and delivery_time &lt;= #{endTime}
+            </if>
+            <if test="status != null and status == 6">
+                and order_time &gt;= #{beginTime} and delivery_time &lt;= #{cancelTime}
+            </if>
+            <if test="number != null">
+                number = #{number}
+            </if>
+            <if test="phone != null">
+                phone = #{phone}
+            </if>
+            <if test="userId != null">
+                user_id = #{userId}
+            </if>
+            <if test="status != null">
+                status = #{status}
+            </if>
+        </where>
+    </select>
+
+
+
+
 </mapper>
